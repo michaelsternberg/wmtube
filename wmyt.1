@@ -1,12 +1,13 @@
 .TH WMYT 1 "October 2026" "wmyt 0.1" "Window Maker dockapps"
 .SH NAME
-wmyt \- play YouTube videos inside a Window Maker dockapp
+wmyt \- play YouTube and PeerTube videos inside a Window Maker dockapp
 .SH SYNOPSIS
 .B wmyt
 [\fIoptions\fR] [\fIURL\fR]
 .SH DESCRIPTION
 .B wmyt
-is a 64x64 dockapp that streams a YouTube (or any yt-dlp supported) video
+is a 64x64 dockapp that streams a YouTube, PeerTube (any instance) or other
+yt-dlp supported video
 inside its tile. The 16:9 video fills a 56x32 band; the rows above and below
 can show a scrolling title and the elapsed / total play time in the classic
 LED dockapp style.
@@ -54,7 +55,8 @@ pause the dockapp.
 .B Middle click
 Play the URL currently in the PRIMARY selection (or, failing that, the
 CLIPBOARD). Only http:// and https:// URLs (or a bare youtube.com / youtu.be
-address) are accepted from the selection; local files and other mpv
+address) are accepted from the selection, so PeerTube links need their full
+https:// URL; local files and other mpv
 protocols must be given on the command line.
 .TP
 .B Right click

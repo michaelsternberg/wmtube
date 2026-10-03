@@ -1,4 +1,4 @@
-/* wmyt - a Window Maker dockapp that plays YouTube videos in the dock
+/* wmyt - a Window Maker dockapp that plays YouTube / PeerTube videos in the dock
  *
  * Copyright (C) 2026 Michael Sternberg
  *
@@ -505,7 +505,7 @@ static void handle_mpv_events(void)
 
 static void usage(void)
 {
-	printf("wmyt " VERSION " - YouTube player dockapp for Window Maker\n\n"
+	printf("wmyt " VERSION " - YouTube / PeerTube player dockapp for Window Maker\n\n"
 	       "usage: wmyt [options] [URL]\n\n"
 	       "  -display DISPLAY    X display to use\n"
 	       "  -mode MODE          text rows to show: both, title, time, none (default both)\n"
@@ -530,9 +530,11 @@ static void on_signal(int sig)
 int main(int argc, char **argv)
 {
 	struct player_opts po = {
-		/* prefer H.264: far cheaper to decode than AV1/VP9 */
+		/* prefer H.264: far cheaper to decode than AV1/VP9. YouTube has
+		 * separate video/audio streams; PeerTube has combined ones. */
 		.ytdl_format = "bestvideo[height<=144][vcodec^=avc1]+bestaudio/"
-		               "bestvideo[height<=144]+bestaudio/best[height<=240]/worst",
+		               "bestvideo[height<=144]+bestaudio/"
+		               "best[height<=144]/best[height<=240]/worst",
 	};
 	const char *dpyname = NULL, *fg = "#20B2AE", *bg = "#202020", *url = NULL;
 	double next_tick;
