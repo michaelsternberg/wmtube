@@ -1,4 +1,9 @@
-/* selection.c - fetch a URL from the X PRIMARY / CLIPBOARD selections */
+/* selection.c - fetch a URL from the X PRIMARY / CLIPBOARD selections
+ *
+ * Copyright (C) 2026 Michael Sternberg
+ * SPDX-License-Identifier: GPL-2.0-or-later
+ * This file is part of wmyt; see COPYING for the full license text.
+ */
 #include <ctype.h>
 #include <stdio.h>
 #include <string.h>

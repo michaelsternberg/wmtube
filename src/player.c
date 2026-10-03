@@ -1,5 +1,9 @@
 /* player.c - libmpv wrapper rendering into a small software buffer
  *
+ * Copyright (C) 2026 Michael Sternberg
+ * SPDX-License-Identifier: GPL-2.0-or-later
+ * This file is part of wmyt; see COPYING for the full license text.
+ *
  * mpv runs with vo=libmpv and the software render API, so every frame is
  * scaled by mpv straight into our 56x32 "bgr0" buffer (which on a
  * little-endian machine is exactly a 0x00RRGGBB uint32_t array).

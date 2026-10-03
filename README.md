@@ -74,6 +74,10 @@ Everything runs in one `poll()` loop on the X connection and an mpv wakeup
 pipe. By default it requests a 144p stream, which uses a few percent of one
 CPU core.
 
+## Disclaimer
+
+wmyt is an independent project. It is not affiliated with, endorsed by, or sponsored by YouTube, Google LLC, or the PeerTube project / Framasoft. YouTube is a trademark of Google LLC; PeerTube is a trademark of Framasoft. Users are responsible for complying with the terms of service of the sites they play videos from.
+
 ## License
 
 GPL version 2 or later; see [COPYING](COPYING).

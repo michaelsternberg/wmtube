@@ -1,4 +1,9 @@
-/* player.h - libmpv wrapper rendering into a small software buffer */
+/* player.h - libmpv wrapper rendering into a small software buffer
+ *
+ * Copyright (C) 2026 Michael Sternberg
+ * SPDX-License-Identifier: GPL-2.0-or-later
+ * This file is part of wmyt; see COPYING for the full license text.
+ */
 #ifndef WMYT_PLAYER_H
 #define WMYT_PLAYER_H
 

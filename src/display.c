@@ -1,5 +1,9 @@
 /* display.c - dockapp window and 64x64 framebuffer
  *
+ * Copyright (C) 2026 Michael Sternberg
+ * SPDX-License-Identifier: GPL-2.0-or-later
+ * This file is part of wmyt; see COPYING for the full license text.
+ *
  * Classic wmgeneral-style setup: a withdrawn main window plus an icon
  * window that Window Maker swallows into the dock/clip, shaped so only the
  * bevelled square is visible.
