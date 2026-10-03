@@ -43,10 +43,9 @@ Show a short help text.
 .SH MOUSE
 .TP
 .B Left click
-Pause / resume (restarts the video once it has ended).
-.TP
-.B Shift + left click
-Cycle the text rows: both, title only, time only, none.
+Pause / resume (restarts the video once it has ended). When no video is
+loaded, toggles the scrolling help text instead (and clears any error
+message), so an idle docked tile can sit still.
 .TP
 .B Double click
 Open the video full size in a separate \fBmpv\fR at the current position and
@@ -56,8 +55,11 @@ pause the dockapp.
 Play the URL currently in the PRIMARY selection (or, failing that, the
 CLIPBOARD).
 .TP
-.B Right click / Shift + right click
-Seek forward / back 10 seconds.
+.B Right click
+Cycle the text rows: both, title only, time only, none.
+.TP
+.B Shift + left click / Shift + right click
+Seek back / forward 10 seconds.
 .TP
 .B Scroll wheel
 Volume up / down; the level is shown briefly in the time row.

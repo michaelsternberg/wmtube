@@ -39,11 +39,13 @@ play whatever URL is in the selection/clipboard.
 
 Mouse
 -----
-    left               pause / resume
-    shift + left       cycle text rows: both -> title -> time -> none
+    left               pause / resume; with no video loaded, show/hide the
+                       scrolling help text
     double left        open full size in mpv at the current position
+    right              cycle text rows: both -> title -> time -> none
+    shift + left       seek back 10s
+    shift + right      seek forward 10s
     middle             play URL from PRIMARY / CLIPBOARD
-    right / shift+right  seek +10s / -10s
     wheel              volume
 
 How it works

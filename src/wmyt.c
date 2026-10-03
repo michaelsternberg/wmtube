@@ -33,6 +33,11 @@
 #define VOLUME_SHOW_MS 1500
 #define ROW_PAD        3	/* gap between a text row and the video */
 
+#define HELP_TOP    "MIDDLE-CLICK TO PLAY URL"
+#define HELP_BOTTOM "LEFT: PAUSE  *  DOUBLE: FULL SIZE  *  RIGHT: TEXT ROWS  *  " \
+                    "SHIFT+LEFT: -10S  *  SHIFT+RIGHT: +10S  *  WHEEL: VOLUME  *  " \
+                    "LEFT NOW: HIDE HELP"
+
 enum mode { MODE_BOTH, MODE_TITLE, MODE_TIME, MODE_NONE, MODE_COUNT };
 static const char *mode_names[] = { "both", "title", "time", "none" };
 
@@ -47,10 +52,11 @@ static struct {
 	char status[256];	/* overrides the title when non-empty */
 	char ytdl_err[256];	/* last yt-dlp error, shown instead of mpv's */
 	double tpos, dur, volume;
-	int paused, eof, have_video;
+	int paused, eof, have_video, loading;
+	int show_help;		/* help text while idle; left click toggles */
 
 	int marquee_off;	/* title scroll position */
-	int time_marquee_off;	/* time row scroll position (>= 1h videos) */
+	int time_marquee_off;	/* bottom row scroll position (long times, help) */
 	double volume_until;	/* monotonic seconds */
 	Time last_click;
 	int dirty;
@@ -70,6 +76,12 @@ static void set_status(const char *s)
 	font_normalize(s, S.status, sizeof(S.status));
 	S.marquee_off = 0;
 	S.dirty = 1;
+}
+
+/* No video loaded or loading: startup, after an error, or an empty paste. */
+static int idle(void)
+{
+	return !S.have_video && !S.loading;
 }
 
 static int in_path(const char *prog)
@@ -109,6 +121,8 @@ static const char *title_text(void)
 {
 	if (S.status[0])
 		return S.status;
+	if (idle() && S.show_help)
+		return HELP_TOP;
 	if (S.title[0])
 		return S.title;
 	return "WMYT";
@@ -168,12 +182,21 @@ static int time_text(char *a, char *b, size_t len)
 	return 2;
 }
 
+static int help_visible(void)
+{
+	return idle() && S.show_help;
+}
+
 static int time_marquee_active(void)
 {
 	char a[40], b[16];
 
+	if (now() < S.volume_until)
+		return 0;
+	if (help_visible())	/* help overrides the display mode */
+		return 1;
 	return (S.mode == MODE_BOTH || S.mode == MODE_TIME) && S.have_video &&
-	       now() >= S.volume_until && time_text(a, b, sizeof(a)) == 2;
+	       time_text(a, b, sizeof(a)) == 2;
 }
 
 static void draw_time_row(int y)
@@ -184,6 +207,10 @@ static void draw_time_row(int y)
 
 	if (now() < S.volume_until) {
 		draw_volume(y);
+		return;
+	}
+	if (help_visible()) {
+		draw_marquee(y, HELP_BOTTOM, S.fg, S.time_marquee_off);
 		return;
 	}
 	if (!S.have_video)
@@ -210,8 +237,8 @@ static void redraw(void)
 	const int title_y = INNER_Y + (INNER_H - VIDEO_H) / 2 - ROW_PAD - FONT_HEIGHT;
 	const int video_y = title_y + FONT_HEIGHT + ROW_PAD;
 	const int time_y = video_y + VIDEO_H + ROW_PAD;
-	int show_title = S.mode == MODE_BOTH || S.mode == MODE_TITLE;
-	int show_time = S.mode == MODE_BOTH || S.mode == MODE_TIME;
+	int show_title = S.mode == MODE_BOTH || S.mode == MODE_TITLE || help_visible();
+	int show_time = S.mode == MODE_BOTH || S.mode == MODE_TIME || help_visible();
 
 	display_clear(&S.d, S.bg);
 	if (show_title)
@@ -227,7 +254,7 @@ static void redraw(void)
 
 static int marquee_active(void)
 {
-	return (S.mode == MODE_BOTH || S.mode == MODE_TITLE) &&
+	return (S.mode == MODE_BOTH || S.mode == MODE_TITLE || help_visible()) &&
 	       font_text_width(title_text()) > INNER_W - 2;
 }
 
@@ -240,6 +267,7 @@ static void load(const char *url)
 	S.tpos = S.dur = -1;
 	S.time_marquee_off = 0;
 	S.have_video = 0;
+	S.loading = 1;
 	memset(S.p.frame, 0, sizeof(S.p.frame));
 	set_status("LOADING");
 	player_load(&S.p, url);
@@ -278,7 +306,15 @@ static void handle_button(XButtonEvent *ev)
 	switch (ev->button) {
 	case Button1:
 		if (shift) {
-			S.mode = (S.mode + 1) % MODE_COUNT;
+			player_seek(&S.p, -10, "relative");
+			break;
+		}
+		if (idle()) {
+			/* nothing to pause: toggle the help text instead, and
+			 * clear any error so the tile can sit quietly */
+			S.show_help = !S.show_help;
+			S.status[0] = '\0';
+			S.marquee_off = S.time_marquee_off = 0;
 			S.dirty = 1;
 			break;
 		}
@@ -299,7 +335,12 @@ static void handle_button(XButtonEvent *ev)
 		selection_request(S.d.dpy, S.d.win, ev->time);
 		break;
 	case Button3:
-		player_seek(&S.p, shift ? -10 : 10, "relative");
+		if (shift) {
+			player_seek(&S.p, 10, "relative");
+			break;
+		}
+		S.mode = (S.mode + 1) % MODE_COUNT;
+		S.dirty = 1;
 		break;
 	case Button4:
 		player_add_volume(&S.p, 5);
@@ -394,6 +435,7 @@ static void handle_mpv_events(void)
 			break;
 		case MPV_EVENT_FILE_LOADED:
 			S.have_video = 1;
+			S.loading = 0;
 			set_status("");
 			break;
 		case MPV_EVENT_END_FILE: {
@@ -401,6 +443,7 @@ static void handle_mpv_events(void)
 
 			if (ef->reason == MPV_END_FILE_REASON_ERROR) {
 				S.have_video = 0;
+				S.loading = 0;
 				if (S.ytdl_err[0])
 					snprintf(msg, sizeof(msg), "ERROR: %s", S.ytdl_err);
 				else
@@ -443,8 +486,9 @@ static void usage(void)
 	       "  -loop               loop the video\n"
 	       "  -ytdl-format FMT    yt-dlp format (default: low resolution)\n"
 	       "  -h, -help           show this help\n\n"
-	       "mouse: left = pause, shift+left = cycle text rows, double-left = open in mpv,\n"
-	       "       middle = play URL from selection, right = +10s, shift+right = -10s,\n"
+	       "mouse: left = pause (no video: toggle help), double-left = open in mpv,\n"
+	       "       right = cycle text rows, shift+left = -10s, shift+right = +10s,\n"
+	       "       middle = play URL from selection,\n"
 	       "       wheel = volume\n");
 }
 
@@ -520,13 +564,12 @@ int main(int argc, char **argv)
 	if (player_init(&S.p, &po) < 0)
 		return 1;
 	S.tpos = S.dur = -1;
+	S.show_help = 1;
 
 	if (!in_path("yt-dlp") && !in_path("youtube-dl"))
 		set_status("NO YT-DLP FOUND");
 	else if (url)
 		load(url);
-	else
-		set_status("MIDDLE-CLICK TO PLAY URL");
 	redraw();
 
 	next_tick = now() + TICK_MS / 1000.0;
