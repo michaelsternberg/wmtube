@@ -1,5 +1,7 @@
 # wmtube
 
+[![build](https://github.com/michaelsternberg/wmtube/actions/workflows/build.yml/badge.svg)](https://github.com/michaelsternberg/wmtube/actions/workflows/build.yml)
+
 A YouTube / PeerTube player dockapp for [Window Maker](https://www.windowmaker.org/).
 
 <img src="docs/screenshot.png" alt="wmtube playing a video in the dock" width="232">
