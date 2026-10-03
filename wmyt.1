@@ -1,0 +1,69 @@
+.TH WMYT 1 "October 2026" "wmyt 0.1" "Window Maker dockapps"
+.SH NAME
+wmyt \- play YouTube videos inside a Window Maker dockapp
+.SH SYNOPSIS
+.B wmyt
+[\fIoptions\fR] [\fIURL\fR]
+.SH DESCRIPTION
+.B wmyt
+is a 64x64 dockapp that streams a YouTube (or any yt-dlp supported) video
+inside its tile. The 16:9 video fills a 56x32 band; the rows above and below
+can show a scrolling title and the elapsed / total play time in the classic
+LED dockapp style.
+.PP
+Playback is done by libmpv, which uses
+.BR yt-dlp (1)
+to resolve the URL. A low-resolution stream is requested by default to keep
+CPU and bandwidth use small.
+.SH OPTIONS
+.TP
+.BI \-display " display"
+X display to connect to.
+.TP
+.BI \-mode " both|title|time|none"
+Which text rows to show initially (default \fBboth\fR).
+.TP
+.BI \-fg " color"
+Text colour (default #20B2AE).
+.TP
+.BI \-bg " color"
+Background colour (default #202020).
+.TP
+.B \-mute
+Start muted.
+.TP
+.B \-loop
+Loop the video forever.
+.TP
+.BI \-ytdl\-format " format"
+yt-dlp format selector (default prefers 144p H.264 plus best audio).
+.TP
+.BR \-h ", " \-help
+Show a short help text.
+.SH MOUSE
+.TP
+.B Left click
+Pause / resume (restarts the video once it has ended).
+.TP
+.B Shift + left click
+Cycle the text rows: both, title only, time only, none.
+.TP
+.B Double click
+Open the video full size in a separate \fBmpv\fR at the current position and
+pause the dockapp.
+.TP
+.B Middle click
+Play the URL currently in the PRIMARY selection (or, failing that, the
+CLIPBOARD).
+.TP
+.B Right click / Shift + right click
+Seek forward / back 10 seconds.
+.TP
+.B Scroll wheel
+Volume up / down; the level is shown briefly in the time row.
+.SH SEE ALSO
+.BR mpv (1),
+.BR yt-dlp (1),
+.BR wmaker (1)
+.SH LICENSE
+GNU General Public License, version 2 or later.

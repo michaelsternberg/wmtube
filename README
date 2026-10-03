@@ -1,0 +1,58 @@
+wmyt - YouTube player dockapp for Window Maker
+==============================================
+
+wmyt streams a YouTube video inside a 64x64 Window Maker dockapp. The 16:9
+video occupies a 56x32 band; the rows above and below optionally show a
+scrolling title and the elapsed / total play time, drawn in the familiar
+5x7 sea-green LED style of wmtop and friends.
+
+    +----------------+
+    |  SCROLLING TI  |   title marquee
+    |################|
+    |#### VIDEO #####|   56x32 video
+    |################|
+    | 01:23    10:34 |   elapsed / total
+    +----------------+
+
+Requirements
+------------
+  * libmpv (Debian: libmpv-dev), libX11, libXext
+  * yt-dlp in $PATH - keep it current (e.g. `pipx install yt-dlp`), since
+    YouTube changes break old versions quickly
+
+Building
+--------
+    make
+    sudo make install        # PREFIX=/usr/local by default
+
+Usage
+-----
+    wmyt [options] [URL]
+
+    -mode both|title|time|none   text rows shown at start (default both)
+    -fg COLOR / -bg COLOR        text / background colour
+    -mute, -loop
+    -ytdl-format FMT             yt-dlp format (default: 144p H.264 + audio)
+
+Drag the tile into the dock or clip. Without a URL, middle-click the tile to
+play whatever URL is in the selection/clipboard.
+
+Mouse
+-----
+    left               pause / resume
+    shift + left       cycle text rows: both -> title -> time -> none
+    double left        open full size in mpv at the current position
+    middle             play URL from PRIMARY / CLIPBOARD
+    right / shift+right  seek +10s / -10s
+    wheel              volume
+
+How it works
+------------
+libmpv runs with vo=libmpv and the software render API, so mpv scales each
+frame straight into a 56x32 buffer which is composited with the bevel and text
+into a 64x64 framebuffer and pushed to the dockapp's icon window. Everything
+runs in one poll() loop on the X connection and an mpv wakeup pipe.
+
+License
+-------
+GPL version 2 or later; see COPYING.
