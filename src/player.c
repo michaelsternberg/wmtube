@@ -55,7 +55,6 @@ int player_init(struct player *p, const struct player_opts *o)
 	}
 	set_opt(p->mpv, "vo", "libmpv");
 	set_opt(p->mpv, "idle", "yes");
-	set_opt(p->mpv, "keep-open", "yes");
 	set_opt(p->mpv, "input-default-bindings", "no");
 	set_opt(p->mpv, "input-vo-keyboard", "no");
 	set_opt(p->mpv, "osc", "no");
@@ -91,7 +90,6 @@ int player_init(struct player *p, const struct player_opts *o)
 	mpv_observe_property(p->mpv, 0, "time-pos", MPV_FORMAT_DOUBLE);
 	mpv_observe_property(p->mpv, 0, "duration", MPV_FORMAT_DOUBLE);
 	mpv_observe_property(p->mpv, 0, "pause", MPV_FORMAT_FLAG);
-	mpv_observe_property(p->mpv, 0, "eof-reached", MPV_FORMAT_FLAG);
 	mpv_observe_property(p->mpv, 0, "volume", MPV_FORMAT_DOUBLE);
 
 	mpv_set_wakeup_callback(p->mpv, wakeup, p);

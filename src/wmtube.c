@@ -56,7 +56,7 @@ static struct {
 	char status[256];	/* overrides the title when non-empty */
 	char ytdl_err[256];	/* last yt-dlp error, shown instead of mpv's */
 	double tpos, dur, volume;
-	int paused, eof, have_video, loading;
+	int paused, have_video, loading;
 	int show_help;		/* help text while idle; left click toggles */
 
 	int marquee_off;	/* title scroll position */
@@ -264,6 +264,19 @@ static int marquee_active(void)
 
 /* ---- actions ---------------------------------------------------------- */
 
+/* Back to the idle tile: blank video, no title or time. Whether the help
+ * text shows is left to S.show_help, i.e. as the user last set it. */
+static void unload(void)
+{
+	S.title[0] = '\0';
+	S.tpos = S.dur = -1;
+	S.have_video = 0;
+	S.loading = 0;
+	S.marquee_off = S.time_marquee_off = 0;
+	memset(S.p.frame, 0, sizeof(S.p.frame));
+	set_status("");
+}
+
 static void load(const char *url)
 {
 	snprintf(S.url, sizeof(S.url), "%s", url);
@@ -331,12 +344,7 @@ static void handle_button(XButtonEvent *ev)
 			break;
 		}
 		S.last_click = ev->time;
-		if (S.eof) {
-			player_seek(&S.p, 0, "absolute");
-			mpv_set_property_string(S.p.mpv, "pause", "no");
-		} else {
-			player_toggle_pause(&S.p);
-		}
+		player_toggle_pause(&S.p);
 		break;
 	case Button2:
 		selection_request(S.d.dpy, S.d.win, ev->time);
@@ -419,8 +427,6 @@ static void handle_property(mpv_event_property *pr)
 		S.dur = pr->format == MPV_FORMAT_DOUBLE ? sane_time(*(double *)pr->data) : -1;
 	} else if (!strcmp(pr->name, "pause")) {
 		S.paused = pr->format == MPV_FORMAT_FLAG && *(int *)pr->data;
-	} else if (!strcmp(pr->name, "eof-reached")) {
-		S.eof = pr->format == MPV_FORMAT_FLAG && *(int *)pr->data;
 	} else if (!strcmp(pr->name, "volume")) {
 		if (pr->format == MPV_FORMAT_DOUBLE)
 			S.volume = *(double *)pr->data;
@@ -472,7 +478,9 @@ static void handle_mpv_events(void)
 		case MPV_EVENT_END_FILE: {
 			mpv_event_end_file *ef = e->data;
 
-			if (ef->reason == MPV_END_FILE_REASON_ERROR) {
+			if (ef->reason == MPV_END_FILE_REASON_EOF) {
+				unload();	/* played to the end (never with -loop) */
+			} else if (ef->reason == MPV_END_FILE_REASON_ERROR) {
 				S.have_video = 0;
 				S.loading = 0;
 				if (S.ytdl_err[0])

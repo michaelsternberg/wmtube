@@ -13,6 +13,8 @@
 - Mouse: left pause, double-left open in mpv, right cycle text rows,
   shift+left / shift+right seek -10 s / +10 s, middle play URL from
   selection, wheel volume.
+- When a video ends the tile returns to its idle state (blank video,
+  help text shown or hidden as last chosen).
 - Prefers low-resolution streams (144p, H.264 when available).
 - Hardened URL handling: selection limited to http(s) URLs, no option
   injection into the external mpv, sanitised log output.
