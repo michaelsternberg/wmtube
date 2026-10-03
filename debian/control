@@ -1,0 +1,29 @@
+Source: wmtube
+Section: x11
+Priority: optional
+Maintainer: Michael Sternberg <mhsternberg@gmail.com>
+Build-Depends: debhelper-compat (= 13),
+               pkgconf,
+               libmpv-dev,
+               libx11-dev,
+               libxext-dev
+Standards-Version: 4.7.2
+Homepage: https://github.com/michaelsternberg/wmtube
+Vcs-Git: https://github.com/michaelsternberg/wmtube.git
+Vcs-Browser: https://github.com/michaelsternberg/wmtube
+Rules-Requires-Root: no
+
+Package: wmtube
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Recommends: yt-dlp, mpv
+Enhances: wmaker
+Description: YouTube / PeerTube player dockapp for Window Maker
+ wmtube streams a video into a 64x64 Window Maker dock tile, using libmpv
+ for playback and yt-dlp to resolve YouTube, PeerTube and other video
+ URLs. The 16:9 video fills a 56x32 band; the rows above and below can
+ show a scrolling title and the elapsed / total play time in the classic
+ LED dockapp style.
+ .
+ Controls are mouse only: pause, seek, volume, cycle the text rows, play a
+ URL from the X selection, or open the video full size in mpv.

@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.1 (unreleased)
+## 0.1 (2026-10-03)
 
 - Renamed from wmyt to wmtube: neutral name now that PeerTube is
   supported, and no YouTube abbreviation in the program name.

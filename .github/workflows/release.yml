@@ -1,0 +1,40 @@
+name: release
+
+# Push a tag like v0.1 to build the Debian package and publish a release.
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  deb:
+    runs-on: ubuntu-latest
+    container: debian:trixie
+    steps:
+      - name: Install build dependencies
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends \
+            build-essential debhelper dpkg-dev fakeroot pkgconf \
+            libmpv-dev libx11-dev libxext-dev ca-certificates git
+      - uses: actions/checkout@v4
+      - name: Check tag matches debian/changelog
+        run: |
+          want="v$(dpkg-parsechangelog -S Version)"
+          if [ "$want" != "$GITHUB_REF_NAME" ]; then
+            echo "tag $GITHUB_REF_NAME does not match debian/changelog ($want)"
+            exit 1
+          fi
+      - name: Build package
+        run: dpkg-buildpackage -us -uc -b
+      - name: Collect package
+        run: |
+          mkdir dist
+          cp ../wmtube_*_amd64.deb dist/
+          ls -l dist
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: dist/*.deb
+          generate_release_notes: true

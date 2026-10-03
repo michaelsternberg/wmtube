@@ -30,11 +30,31 @@ in the 5x7 sea-green LED style of wmtop and other classic dockapps.
   (e.g. `pipx install yt-dlp`), because site changes break old versions quickly.
 - `mpv` (optional), for the double-click "open full size" action
 
+## Installing
+
+On Debian 13 (trixie) and derivatives, download the `.deb` from the
+[latest release](https://github.com/michaelsternberg/wmtube/releases/latest)
+and install it with apt, which also pulls in the libraries it needs:
+
+```sh
+sudo apt install ./wmtube_*_amd64.deb
+```
+
+The package recommends `yt-dlp` and `mpv`. Debian's yt-dlp gets out of date
+quickly, so for YouTube a current yt-dlp (e.g. `pipx install yt-dlp`) is
+better.
+
 ## Building
 
 ```sh
 make
 sudo make install        # PREFIX=/usr/local by default; DESTDIR is honoured
+```
+
+To build the Debian package yourself (needs `debhelper`):
+
+```sh
+dpkg-buildpackage -us -uc -b      # writes ../wmtube_<version>_amd64.deb
 ```
 
 ## Usage
