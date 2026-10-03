@@ -1,0 +1,20 @@
+name: build
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            build-essential pkg-config libmpv-dev libx11-dev libxext-dev
+      - name: Build
+        run: CFLAGS="-O2 -Werror" make
+      - name: Install (staged)
+        run: make install DESTDIR="$PWD/stage" && find stage -type f
