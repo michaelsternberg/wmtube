@@ -8,6 +8,7 @@
  * any later version.
  */
 #include <errno.h>
+#include <math.h>
 #include <poll.h>
 #include <signal.h>
 #include <stdio.h>
@@ -32,6 +33,7 @@
 #define DBLCLICK_MS    300
 #define VOLUME_SHOW_MS 1500
 #define ROW_PAD        3	/* gap between a text row and the video */
+#define MAX_TIME       (1000.0 * 3600 - 1)	/* clamp stream times to 999:59:59 */
 
 #define HELP_TOP    "MIDDLE-CLICK TO PLAY URL"
 #define HELP_BOTTOM "LEFT: PAUSE  *  DOUBLE: FULL SIZE  *  RIGHT: TEXT ROWS  *  " \
@@ -165,20 +167,20 @@ static void draw_volume(int y)
  * (a = elapsed, b = total), 0 if only a is meaningful (live stream), or 2 if
  * they do not fit and a holds "elapsed / total" for the marquee.
  */
-static int time_text(char *a, char *b, size_t len)
+static int time_text(char *a, size_t alen, char *b, size_t blen)
 {
 	int hours = S.dur >= 3600 || S.tpos >= 3600;
 	int wide = S.dur >= 600 || S.tpos >= 600;
 	char e[16];
 
-	fmt_time(S.tpos, hours, wide, a, len);
+	fmt_time(S.tpos, hours, wide, a, alen);
 	if (S.dur <= 0)	/* live stream / unknown length: elapsed only */
 		return 0;
-	fmt_time(S.dur, hours, wide, b, len);
+	fmt_time(S.dur, hours, wide, b, blen);
 	if (font_text_width(a) + font_text_width(b) + 2 <= INNER_W - 2)
 		return 1;
 	snprintf(e, sizeof(e), "%s", a);
-	snprintf(a, len, "%s / %s", e, b);
+	snprintf(a, alen, "%s / %s", e, b);
 	return 2;
 }
 
@@ -196,7 +198,7 @@ static int time_marquee_active(void)
 	if (help_visible())	/* help overrides the display mode */
 		return 1;
 	return (S.mode == MODE_BOTH || S.mode == MODE_TIME) && S.have_video &&
-	       time_text(a, b, sizeof(a)) == 2;
+	       time_text(a, sizeof(a), b, sizeof(b)) == 2;
 }
 
 static void draw_time_row(int y)
@@ -215,7 +217,7 @@ static void draw_time_row(int y)
 	}
 	if (!S.have_video)
 		return;
-	switch (time_text(a, b, sizeof(a))) {
+	switch (time_text(a, sizeof(a), b, sizeof(b))) {
 	case 0:
 		font_draw(S.d.fb, TILE, x0, y, a, c, INNER_X, INNER_X + INNER_W);
 		break;
@@ -279,7 +281,8 @@ static void open_external(void)
 	char start[32];
 	pid_t pid;
 
-	if (!S.url[0])
+	/* only a URL that mpv has actually loaded is handed on */
+	if (!S.url[0] || !S.have_video)
 		return;
 	snprintf(start, sizeof(start), "--start=%.0f", S.tpos > 0 ? S.tpos : 0);
 	/* double fork so the child is reparented to init and never a zombie;
@@ -288,7 +291,9 @@ static void open_external(void)
 	if (pid == 0) {
 		setsid();
 		if (fork() == 0) {
-			execlp("mpv", "mpv", "--force-window=immediate", start, S.url, (char *)NULL);
+			/* "--": the URL must never be parsed as an mpv option */
+			execlp("mpv", "mpv", "--force-window=immediate", start, "--",
+			       S.url, (char *)NULL);
 			_exit(127);
 		}
 		_exit(0);
@@ -384,6 +389,14 @@ static void handle_x_events(void)
 	}
 }
 
+/* Times come from the stream: keep them finite and within int range. */
+static double sane_time(double t)
+{
+	if (!isfinite(t) || t < 0)
+		return -1;
+	return t > MAX_TIME ? MAX_TIME : t;
+}
+
 static void handle_property(mpv_event_property *pr)
 {
 	if (!strcmp(pr->name, "media-title")) {
@@ -393,7 +406,7 @@ static void handle_property(mpv_event_property *pr)
 			S.title[0] = '\0';
 		S.marquee_off = 0;
 	} else if (!strcmp(pr->name, "time-pos")) {
-		double t = pr->format == MPV_FORMAT_DOUBLE ? *(double *)pr->data : -1;
+		double t = pr->format == MPV_FORMAT_DOUBLE ? sane_time(*(double *)pr->data) : -1;
 
 		int same = (int)t == (int)S.tpos;
 
@@ -401,7 +414,7 @@ static void handle_property(mpv_event_property *pr)
 		if (same)
 			return;	/* only redraw on whole seconds */
 	} else if (!strcmp(pr->name, "duration")) {
-		S.dur = pr->format == MPV_FORMAT_DOUBLE ? *(double *)pr->data : -1;
+		S.dur = pr->format == MPV_FORMAT_DOUBLE ? sane_time(*(double *)pr->data) : -1;
 	} else if (!strcmp(pr->name, "pause")) {
 		S.paused = pr->format == MPV_FORMAT_FLAG && *(int *)pr->data;
 	} else if (!strcmp(pr->name, "eof-reached")) {
@@ -411,6 +424,22 @@ static void handle_property(mpv_event_property *pr)
 			S.volume = *(double *)pr->data;
 	}
 	S.dirty = 1;
+}
+
+/* Print an mpv log line with control characters (terminal escapes from
+ * remote content) replaced. */
+static void log_safe(const char *prefix, const char *text)
+{
+	char buf[1024];
+	size_t n = 0;
+
+	for (; *text && n < sizeof(buf) - 1; text++) {
+		unsigned char ch = (unsigned char)*text;
+
+		buf[n++] = (ch < 0x20 && ch != '\n' && ch != '\t') || ch == 0x7f ? '?' : (char)ch;
+	}
+	buf[n] = '\0';
+	fprintf(stderr, "wmyt: [%s] %s", prefix, buf);
 }
 
 static void handle_mpv_events(void)
@@ -456,7 +485,7 @@ static void handle_mpv_events(void)
 		case MPV_EVENT_LOG_MESSAGE: {
 			mpv_event_log_message *lm = e->data;
 
-			fprintf(stderr, "wmyt: [%s] %s", lm->prefix, lm->text);
+			log_safe(lm->prefix, lm->text);
 			/* "ERROR: [youtube] <id>: This video is unavailable" */
 			if (!strcmp(lm->prefix, "ytdl_hook") &&
 			    !strncmp(lm->text, "ERROR: ", 7)) {

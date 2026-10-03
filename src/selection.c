@@ -1,6 +1,8 @@
 /* selection.c - fetch a URL from the X PRIMARY / CLIPBOARD selections */
 #include <ctype.h>
+#include <stdio.h>
 #include <string.h>
+#include <strings.h>
 
 #include <X11/Xatom.h>
 
@@ -22,10 +24,21 @@ void selection_request(Display *dpy, Window win, Time t)
 	request(dpy, win, XA_PRIMARY, t);
 }
 
-/* Trim whitespace and accept things that look like a URL or a video id. */
+/*
+ * Selections can hold arbitrary (even hostile) text, so only plain web URLs
+ * are accepted: http:// or https://, or a scheme-less YouTube address which
+ * gets https:// prepended. Anything else mpv understands (local paths,
+ * file://, av://, edl://, memory://, ...) is refused, as is any text with
+ * whitespace, control or non-ASCII characters inside it.
+ */
 static int usable(const char *in, char *url, int urllen)
 {
-	const char *s = in, *e;
+	static const char *const hosts[] = {
+		"youtube.com/", "www.youtube.com/", "m.youtube.com/",
+		"music.youtube.com/", "youtu.be/",
+	};
+	const char *s = in, *e, *p, *prefix = NULL;
+	size_t i;
 	int n;
 
 	while (*s && isspace((unsigned char)*s))
@@ -34,14 +47,24 @@ static int usable(const char *in, char *url, int urllen)
 	while (e > s && isspace((unsigned char)e[-1]))
 		e--;
 	n = (int)(e - s);
-	if (n <= 0 || n >= urllen || memchr(s, '\n', (size_t)n))
+	if (n <= 0)
 		return 0;
-	if (memmem(s, (size_t)n, "://", 3) || memmem(s, (size_t)n, "youtu", 5)) {
-		memcpy(url, s, (size_t)n);
-		url[n] = '\0';
-		return 1;
+	/* printable ASCII only (browsers percent-encode everything else) */
+	for (p = s; p < e; p++)
+		if ((unsigned char)*p <= ' ' || (unsigned char)*p >= 0x7f)
+			return 0;
+
+	if (!strncasecmp(s, "http://", 7) || !strncasecmp(s, "https://", 8)) {
+		prefix = "";
+	} else {
+		for (i = 0; i < sizeof(hosts) / sizeof(hosts[0]); i++)
+			if (!strncasecmp(s, hosts[i], strlen(hosts[i])))
+				prefix = "https://";
 	}
-	return 0;
+	if (!prefix || (int)strlen(prefix) + n >= urllen)
+		return 0;
+	snprintf(url, (size_t)urllen, "%s%.*s", prefix, n, s);
+	return 1;
 }
 
 int selection_notify(Display *dpy, XSelectionEvent *ev, char *url, int urllen)

@@ -35,7 +35,9 @@ Usage
     -ytdl-format FMT             yt-dlp format (default: 144p H.264 + audio)
 
 Drag the tile into the dock or clip. Without a URL, middle-click the tile to
-play whatever URL is in the selection/clipboard.
+play whatever URL is in the selection/clipboard. For safety only http(s)
+URLs (or a bare youtube.com / youtu.be address) are taken from the
+selection; local files can still be given on the command line.
 
 Mouse
 -----
