@@ -2,6 +2,8 @@
 
 ## 0.1 (unreleased)
 
+- Renamed from wmyt to wmtube: neutral name now that PeerTube is
+  supported, and no YouTube abbreviation in the program name.
 - First version: plays YouTube and PeerTube (via libmpv + yt-dlp) in a
   64x64 Window Maker dockapp, with a scrolling title and play time in the
   wmtop LED style.

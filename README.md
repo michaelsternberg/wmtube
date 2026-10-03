@@ -1,10 +1,10 @@
-# wmyt
+# wmtube
 
 A YouTube / PeerTube player dockapp for [Window Maker](https://www.windowmaker.org/).
 
-<img src="docs/screenshot.png" alt="wmyt playing a video in the dock" width="232">
+<img src="docs/screenshot.png" alt="wmtube playing a video in the dock" width="232">
 
-wmyt streams a video into a 64x64 dock tile. It plays YouTube, PeerTube (any
+wmtube streams a video into a 64x64 dock tile. It plays YouTube, PeerTube (any
 server), or anything else [yt-dlp](https://github.com/yt-dlp/yt-dlp) can
 resolve. The 16:9 video fills a 56x32 band in the middle of the tile. The rows
 above and below can show a scrolling title and the elapsed / total play time,
@@ -38,7 +38,7 @@ sudo make install        # PREFIX=/usr/local by default; DESTDIR is honoured
 ## Usage
 
 ```
-wmyt [options] [URL]
+wmtube [options] [URL]
 
   -mode both|title|time|none   text rows shown at start (default both)
   -fg COLOR / -bg COLOR        text / background colour
@@ -68,7 +68,7 @@ on the command line.
 ## How it works
 
 libmpv runs with `vo=libmpv` and the software render API. mpv scales each
-frame straight into a 56x32 buffer. wmyt combines that buffer with the bevel
+frame straight into a 56x32 buffer. wmtube combines that buffer with the bevel
 and text into a 64x64 framebuffer and pushes it to the dockapp's icon window.
 Everything runs in one `poll()` loop on the X connection and an mpv wakeup
 pipe. By default it requests a 144p stream, which uses a few percent of one
@@ -76,7 +76,7 @@ CPU core.
 
 ## Disclaimer
 
-wmyt is an independent project. It is not affiliated with, endorsed by, or sponsored by YouTube, Google LLC, or the PeerTube project / Framasoft. YouTube is a trademark of Google LLC; PeerTube is a trademark of Framasoft. Users are responsible for complying with the terms of service of the sites they play videos from.
+wmtube is an independent project. It is not affiliated with, endorsed by, or sponsored by YouTube, Google LLC, or the PeerTube project / Framasoft. YouTube is a trademark of Google LLC; PeerTube is a trademark of Framasoft. Users are responsible for complying with the terms of service of the sites they play videos from.
 
 ## License
 

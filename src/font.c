@@ -1,8 +1,8 @@
-/* font.c - 5x7 LED-style pixel font for wmyt
+/* font.c - 5x7 LED-style pixel font for wmtube
  *
  * Copyright (C) 2026 Michael Sternberg
  * SPDX-License-Identifier: GPL-2.0-or-later
- * This file is part of wmyt; see COPYING for the full license text.
+ * This file is part of wmtube; see COPYING for the full license text.
  *
  * Glyphs are 7 rows tall; a glyph's width is the length of its rows.
  * Characters are separated by a 1 pixel gap, so the usual advance is 6px,

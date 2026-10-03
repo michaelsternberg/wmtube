@@ -2,7 +2,7 @@
  *
  * Copyright (C) 2026 Michael Sternberg
  * SPDX-License-Identifier: GPL-2.0-or-later
- * This file is part of wmyt; see COPYING for the full license text.
+ * This file is part of wmtube; see COPYING for the full license text.
  */
 #include <ctype.h>
 #include <stdio.h>
@@ -15,7 +15,7 @@
 
 static Atom prop_atom(Display *dpy)
 {
-	return XInternAtom(dpy, "WMYT_SELECTION", False);
+	return XInternAtom(dpy, "WMTUBE_SELECTION", False);
 }
 
 static void request(Display *dpy, Window win, Atom sel, Time t)

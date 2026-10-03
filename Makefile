@@ -1,4 +1,4 @@
-# wmyt - YouTube player dockapp for Window Maker
+# wmtube - YouTube / PeerTube player dockapp for Window Maker
 
 PREFIX  ?= /usr/local
 BINDIR  ?= $(PREFIX)/bin
@@ -10,28 +10,28 @@ CFLAGS  ?= -O2 -g
 CFLAGS  += -Wall -Wextra -std=c99 -D_GNU_SOURCE $(shell pkg-config --cflags $(PKGS))
 LDLIBS  += $(shell pkg-config --libs $(PKGS))
 
-SRC = src/wmyt.c src/display.c src/font.c src/player.c src/selection.c
+SRC = src/wmtube.c src/display.c src/font.c src/player.c src/selection.c
 OBJ = $(SRC:.c=.o)
 
-all: wmyt
+all: wmtube
 
-wmyt: $(OBJ)
+wmtube: $(OBJ)
 	$(CC) $(LDFLAGS) -o $@ $(OBJ) $(LDLIBS)
 
-src/wmyt.o: src/display.h src/font.h src/player.h src/selection.h
+src/wmtube.o: src/display.h src/font.h src/player.h src/selection.h
 src/display.o: src/display.h
 src/font.o: src/font.h
 src/player.o: src/player.h
 src/selection.o: src/selection.h
 
-install: wmyt
-	install -Dm755 wmyt $(DESTDIR)$(BINDIR)/wmyt
-	install -Dm644 wmyt.1 $(DESTDIR)$(MANDIR)/wmyt.1
+install: wmtube
+	install -Dm755 wmtube $(DESTDIR)$(BINDIR)/wmtube
+	install -Dm644 wmtube.1 $(DESTDIR)$(MANDIR)/wmtube.1
 
 uninstall:
-	rm -f $(DESTDIR)$(BINDIR)/wmyt $(DESTDIR)$(MANDIR)/wmyt.1
+	rm -f $(DESTDIR)$(BINDIR)/wmtube $(DESTDIR)$(MANDIR)/wmtube.1
 
 clean:
-	rm -f wmyt $(OBJ)
+	rm -f wmtube $(OBJ)
 
 .PHONY: all install uninstall clean

@@ -1,4 +1,4 @@
-/* wmyt - a Window Maker dockapp that plays YouTube / PeerTube videos in the dock
+/* wmtube - a Window Maker dockapp that plays YouTube / PeerTube videos
  *
  * Copyright (C) 2026 Michael Sternberg
  *
@@ -129,7 +129,7 @@ static const char *title_text(void)
 		return HELP_TOP;
 	if (S.title[0])
 		return S.title;
-	return "WMYT";
+	return "WMTUBE";
 }
 
 /* Draw t centred if it fits, otherwise as a seamless scrolling marquee. */
@@ -441,7 +441,7 @@ static void log_safe(const char *prefix, const char *text)
 		buf[n++] = (ch < 0x20 && ch != '\n' && ch != '\t') || ch == 0x7f ? '?' : (char)ch;
 	}
 	buf[n] = '\0';
-	fprintf(stderr, "wmyt: [%s] %s", prefix, buf);
+	fprintf(stderr, "wmtube: [%s] %s", prefix, buf);
 }
 
 static void handle_mpv_events(void)
@@ -507,8 +507,8 @@ static void handle_mpv_events(void)
 
 static void usage(void)
 {
-	printf("wmyt " VERSION " - YouTube / PeerTube player dockapp for Window Maker\n\n"
-	       "usage: wmyt [options] [URL]\n\n"
+	printf("wmtube " VERSION " - YouTube / PeerTube player dockapp for Window Maker\n\n"
+	       "usage: wmtube [options] [URL]\n\n"
 	       "  -display DISPLAY    X display to use\n"
 	       "  -mode MODE          text rows to show: both, title, time, none (default both)\n"
 	       "  -fg COLOR           text colour (default #20B2AE)\n"
@@ -555,7 +555,7 @@ int main(int argc, char **argv)
 			for (k = 0; k < MODE_COUNT && strcmp(m, mode_names[k]); k++)
 				;
 			if (k == MODE_COUNT) {
-				fprintf(stderr, "wmyt: unknown mode '%s'\n", m);
+				fprintf(stderr, "wmtube: unknown mode '%s'\n", m);
 				return 1;
 			}
 			S.mode = k;
@@ -575,7 +575,7 @@ int main(int argc, char **argv)
 		} else if (a[0] != '-' && !url)
 			url = a;
 		else {
-			fprintf(stderr, "wmyt: bad option '%s' (try -help)\n", a);
+			fprintf(stderr, "wmtube: bad option '%s' (try -help)\n", a);
 			return 1;
 		}
 	}
@@ -588,7 +588,7 @@ int main(int argc, char **argv)
 		return 1;
 	if (display_parse_color(&S.d, fg, &S.fg) < 0 ||
 	    display_parse_color(&S.d, bg, &S.bg) < 0) {
-		fprintf(stderr, "wmyt: bad colour\n");
+		fprintf(stderr, "wmtube: bad colour\n");
 		return 1;
 	}
 	/* dimmed text (paused): halfway between fg and bg */

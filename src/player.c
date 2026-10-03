@@ -2,7 +2,7 @@
  *
  * Copyright (C) 2026 Michael Sternberg
  * SPDX-License-Identifier: GPL-2.0-or-later
- * This file is part of wmyt; see COPYING for the full license text.
+ * This file is part of wmtube; see COPYING for the full license text.
  *
  * mpv runs with vo=libmpv and the software render API, so every frame is
  * scaled by mpv straight into our 56x32 "bgr0" buffer (which on a
@@ -23,7 +23,7 @@ static void wakeup(void *ctx)
 
 	/* non-blocking; if the pipe is full the main loop is awake anyway */
 	if (write(p->wake_pipe[1], &c, 1) < 0 && errno != EAGAIN)
-		perror("wmyt: wakeup pipe");
+		perror("wmtube: wakeup pipe");
 }
 
 static void set_opt(mpv_handle *mpv, const char *name, const char *val)
@@ -31,7 +31,7 @@ static void set_opt(mpv_handle *mpv, const char *name, const char *val)
 	int err = mpv_set_option_string(mpv, name, val);
 
 	if (err < 0)
-		fprintf(stderr, "wmyt: mpv option %s=%s: %s\n", name, val, mpv_error_string(err));
+		fprintf(stderr, "wmtube: mpv option %s=%s: %s\n", name, val, mpv_error_string(err));
 }
 
 int player_init(struct player *p, const struct player_opts *o)
@@ -40,7 +40,7 @@ int player_init(struct player *p, const struct player_opts *o)
 
 	memset(p, 0, sizeof(*p));
 	if (pipe(p->wake_pipe) < 0) {
-		perror("wmyt: pipe");
+		perror("wmtube: pipe");
 		return -1;
 	}
 	for (i = 0; i < 2; i++) {
@@ -50,7 +50,7 @@ int player_init(struct player *p, const struct player_opts *o)
 
 	p->mpv = mpv_create();
 	if (!p->mpv) {
-		fprintf(stderr, "wmyt: mpv_create failed\n");
+		fprintf(stderr, "wmtube: mpv_create failed\n");
 		return -1;
 	}
 	set_opt(p->mpv, "vo", "libmpv");
@@ -61,7 +61,7 @@ int player_init(struct player *p, const struct player_opts *o)
 	set_opt(p->mpv, "osc", "no");
 	set_opt(p->mpv, "ytdl", "yes");
 	set_opt(p->mpv, "ytdl-format", o->ytdl_format);
-	set_opt(p->mpv, "audio-client-name", "wmyt");
+	set_opt(p->mpv, "audio-client-name", "wmtube");
 	set_opt(p->mpv, "background-color", "#000000");
 	if (o->mute)
 		set_opt(p->mpv, "mute", "yes");
@@ -70,7 +70,7 @@ int player_init(struct player *p, const struct player_opts *o)
 
 	err = mpv_initialize(p->mpv);
 	if (err < 0) {
-		fprintf(stderr, "wmyt: mpv_initialize: %s\n", mpv_error_string(err));
+		fprintf(stderr, "wmtube: mpv_initialize: %s\n", mpv_error_string(err));
 		return -1;
 	}
 	mpv_request_log_messages(p->mpv, "error");
@@ -82,7 +82,7 @@ int player_init(struct player *p, const struct player_opts *o)
 		};
 		err = mpv_render_context_create(&p->rc, p->mpv, params);
 		if (err < 0) {
-			fprintf(stderr, "wmyt: mpv render context: %s\n", mpv_error_string(err));
+			fprintf(stderr, "wmtube: mpv render context: %s\n", mpv_error_string(err));
 			return -1;
 		}
 	}
@@ -139,7 +139,7 @@ void player_command(struct player *p, const char **args)
 	int err = mpv_command_async(p->mpv, 0, args);
 
 	if (err < 0)
-		fprintf(stderr, "wmyt: mpv command %s: %s\n", args[0], mpv_error_string(err));
+		fprintf(stderr, "wmtube: mpv command %s: %s\n", args[0], mpv_error_string(err));
 }
 
 void player_load(struct player *p, const char *url)

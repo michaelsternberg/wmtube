@@ -2,7 +2,7 @@
  *
  * Copyright (C) 2026 Michael Sternberg
  * SPDX-License-Identifier: GPL-2.0-or-later
- * This file is part of wmyt; see COPYING for the full license text.
+ * This file is part of wmtube; see COPYING for the full license text.
  *
  * Classic wmgeneral-style setup: a withdrawn main window plus an icon
  * window that Window Maker swallows into the dock/clip, shaped so only the
@@ -34,7 +34,7 @@ int display_open(struct display *d, const char *dpyname, int argc, char **argv)
 	memset(d, 0, sizeof(*d));
 	d->dpy = XOpenDisplay(dpyname);
 	if (!d->dpy) {
-		fprintf(stderr, "wmyt: cannot open display %s\n", XDisplayName(dpyname));
+		fprintf(stderr, "wmtube: cannot open display %s\n", XDisplayName(dpyname));
 		return -1;
 	}
 	scr = DefaultScreen(d->dpy);
@@ -43,7 +43,7 @@ int display_open(struct display *d, const char *dpyname, int argc, char **argv)
 	depth = DefaultDepth(d->dpy, scr);
 	if (depth < 24 || vis->red_mask != 0xff0000 || vis->green_mask != 0xff00 ||
 	    vis->blue_mask != 0xff) {
-		fprintf(stderr, "wmyt: need a 24/32-bit RGB TrueColor visual\n");
+		fprintf(stderr, "wmtube: need a 24/32-bit RGB TrueColor visual\n");
 		XCloseDisplay(d->dpy);
 		return -1;
 	}
@@ -58,11 +58,11 @@ int display_open(struct display *d, const char *dpyname, int argc, char **argv)
 	sh.width = sh.height = TILE;
 	XSetWMNormalHints(d->dpy, d->win, &sh);
 
-	ch.res_name = "wmyt";
+	ch.res_name = "wmtube";
 	ch.res_class = "DockApp";
 	XSetClassHint(d->dpy, d->win, &ch);
-	XStoreName(d->dpy, d->win, "wmyt");
-	XSetIconName(d->dpy, d->win, "wmyt");
+	XStoreName(d->dpy, d->win, "wmtube");
+	XSetIconName(d->dpy, d->win, "wmtube");
 
 	wmh.flags = StateHint | IconWindowHint | IconPositionHint | WindowGroupHint;
 	wmh.initial_state = WithdrawnState;
@@ -91,7 +91,7 @@ int display_open(struct display *d, const char *dpyname, int argc, char **argv)
 	d->img = XCreateImage(d->dpy, vis, depth, ZPixmap, 0, (char *)d->fb,
 	                      TILE, TILE, 32, TILE * 4);
 	if (!d->img || d->img->bits_per_pixel != 32) {
-		fprintf(stderr, "wmyt: unsupported image format\n");
+		fprintf(stderr, "wmtube: unsupported image format\n");
 		return -1;
 	}
 
