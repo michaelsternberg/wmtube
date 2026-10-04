@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased
+
+- Clear the video area when switching to an audio-only stream, so the
+  previous video's last frame no longer stays on screen.
+- Live streams and internet radio show elapsed time only (mpv's
+  "duration" for them is just elapsed time plus the buffer).
+
 ## 0.1 (2026-10-03)
 
 - Renamed from wmyt to wmtube: neutral name now that PeerTube is

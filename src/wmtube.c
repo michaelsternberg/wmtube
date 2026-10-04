@@ -57,6 +57,8 @@ static struct {
 	char ytdl_err[256];	/* last yt-dlp error, shown instead of mpv's */
 	double tpos, dur, volume;
 	int paused, have_video, loading;
+	int vo_ok;		/* mpv has a video output (file has video) */
+	int seekable;		/* false for live streams / internet radio */
 	int show_help;		/* help text while idle; left click toggles */
 
 	int marquee_off;	/* title scroll position */
@@ -176,7 +178,9 @@ static int time_text(char *a, size_t alen, char *b, size_t blen)
 	char e[16];
 
 	fmt_time(S.tpos, hours, wide, a, alen);
-	if (S.dur <= 0)	/* live stream / unknown length: elapsed only */
+	/* live stream / radio: mpv's "duration" there is just elapsed time
+	 * plus the buffer, so show elapsed only */
+	if (S.dur <= 0 || !S.seekable)
 		return 0;
 	fmt_time(S.dur, hours, wide, b, blen);
 	if (font_text_width(a) + font_text_width(b) + 2 <= INNER_W - 2)
@@ -430,6 +434,13 @@ static void handle_property(mpv_event_property *pr)
 	} else if (!strcmp(pr->name, "volume")) {
 		if (pr->format == MPV_FORMAT_DOUBLE)
 			S.volume = *(double *)pr->data;
+	} else if (!strcmp(pr->name, "seekable")) {
+		S.seekable = pr->format == MPV_FORMAT_FLAG && *(int *)pr->data;
+	} else if (!strcmp(pr->name, "vo-configured")) {
+		S.vo_ok = pr->format == MPV_FORMAT_FLAG && *(int *)pr->data;
+		/* switching to audio-only: don't leave the last picture behind */
+		if (!S.vo_ok)
+			memset(S.p.frame, 0, sizeof(S.p.frame));
 	}
 	S.dirty = 1;
 }

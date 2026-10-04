@@ -79,6 +79,10 @@ Playlist links (including YouTube Music playlists) play their tracks in
 order. Between tracks the video area goes blank and the title shows
 `LOADING` until the next one starts; album-only tracks show their cover art.
 
+Internet radio and other live streams (e.g. Icecast / SHOUTcast URLs) play
+with a blank video area and elapsed time only; the title follows the
+station's "now playing" information as songs change.
+
 ## Mouse
 
 | Action          | Effect                                                                 |

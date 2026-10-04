@@ -91,6 +91,8 @@ int player_init(struct player *p, const struct player_opts *o)
 	mpv_observe_property(p->mpv, 0, "duration", MPV_FORMAT_DOUBLE);
 	mpv_observe_property(p->mpv, 0, "pause", MPV_FORMAT_FLAG);
 	mpv_observe_property(p->mpv, 0, "volume", MPV_FORMAT_DOUBLE);
+	mpv_observe_property(p->mpv, 0, "vo-configured", MPV_FORMAT_FLAG);
+	mpv_observe_property(p->mpv, 0, "seekable", MPV_FORMAT_FLAG);
 
 	mpv_set_wakeup_callback(p->mpv, wakeup, p);
 	mpv_render_context_set_update_callback(p->rc, wakeup, p);
