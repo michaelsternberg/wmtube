@@ -40,5 +40,6 @@ void player_command(struct player *p, const char **args);
 void player_toggle_pause(struct player *p);
 void player_seek(struct player *p, double secs, const char *how);
 void player_add_volume(struct player *p, double delta);
+void player_playlist_step(struct player *p, int dir);
 
 #endif

@@ -39,7 +39,8 @@
 
 #define HELP_TOP    "MIDDLE-CLICK TO PLAY URL"
 #define HELP_BOTTOM "LEFT: PAUSE  *  DOUBLE: FULL SIZE  *  RIGHT: TEXT ROWS  *  " \
-                    "SHIFT+LEFT: -10S  *  SHIFT+RIGHT: +10S  *  WHEEL: VOLUME  *  " \
+                    "SHIFT+LEFT: -10S  *  SHIFT+RIGHT: +10S  *  " \
+                    "CTRL+LEFT: PREV TRACK  *  CTRL+RIGHT: NEXT TRACK  *  WHEEL: VOLUME  *  " \
                     "LEFT NOW: HIDE HELP"
 
 enum mode { MODE_BOTH, MODE_TITLE, MODE_TIME, MODE_NONE, MODE_COUNT };
@@ -326,9 +327,14 @@ static void open_external(void)
 static void handle_button(XButtonEvent *ev)
 {
 	int shift = ev->state & ShiftMask;
+	int ctrl = ev->state & ControlMask;
 
 	switch (ev->button) {
 	case Button1:
+		if (ctrl) {
+			player_playlist_step(&S.p, -1);
+			break;
+		}
 		if (shift) {
 			player_seek(&S.p, -10, "relative");
 			break;
@@ -354,6 +360,10 @@ static void handle_button(XButtonEvent *ev)
 		selection_request(S.d.dpy, S.d.win, ev->time);
 		break;
 	case Button3:
+		if (ctrl) {
+			player_playlist_step(&S.p, 1);
+			break;
+		}
 		if (shift) {
 			player_seek(&S.p, 10, "relative");
 			break;
@@ -538,6 +548,7 @@ static void usage(void)
 	       "  -h, -help           show this help\n\n"
 	       "mouse: left = pause (no video: toggle help), double-left = open in mpv,\n"
 	       "       right = cycle text rows, shift+left = -10s, shift+right = +10s,\n"
+	       "       ctrl+left = previous track, ctrl+right = next track,\n"
 	       "       middle = play URL from selection,\n"
 	       "       wheel = volume\n");
 }

@@ -92,6 +92,8 @@ station's "now playing" information as songs change.
 | Right           | cycle text rows: both → title → time → none                            |
 | Shift + left    | seek back 10 s                                                         |
 | Shift + right   | seek forward 10 s                                                      |
+| Ctrl + left     | previous track (playlists)                                             |
+| Ctrl + right    | next track (playlists)                                                 |
 | Middle          | play URL from PRIMARY / CLIPBOARD                                      |
 | Wheel           | volume                                                                 |
 

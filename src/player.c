@@ -166,6 +166,15 @@ void player_seek(struct player *p, double secs, const char *how)
 	player_command(p, cmd);
 }
 
+/* Move through a playlist: dir < 0 previous, dir > 0 next. Does nothing
+ * at either end (mpv's default "weak" behaviour) or for a single video. */
+void player_playlist_step(struct player *p, int dir)
+{
+	const char *cmd[] = { dir < 0 ? "playlist-prev" : "playlist-next", NULL };
+
+	player_command(p, cmd);
+}
+
 void player_add_volume(struct player *p, double delta)
 {
 	char s[32];
