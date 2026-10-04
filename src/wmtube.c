@@ -60,6 +60,8 @@ static struct {
 	int paused, have_video, loading;
 	int vo_ok;		/* mpv has a video output (file has video) */
 	int seekable;		/* false for live streams / internet radio */
+	int show_tracknum;	/* -tracknum: append " [M/N]" to the title */
+	long long track, tracks;	/* playlist position (1-based) and length */
 	int show_help;		/* help text while idle; left click toggles */
 
 	int marquee_off;	/* title scroll position */
@@ -126,13 +128,19 @@ static void fmt_time(double t, int hours, int wide_min, char *out, size_t len)
 
 static const char *title_text(void)
 {
+	static char buf[sizeof(S.title) + 48];
+
 	if (S.status[0])
 		return S.status;
 	if (idle() && S.show_help)
 		return HELP_TOP;
-	if (S.title[0])
-		return S.title;
-	return "WMTUBE";
+	if (!S.title[0])
+		return "WMTUBE";
+	if (S.show_tracknum && S.tracks > 1 && S.track > 0) {
+		snprintf(buf, sizeof(buf), "%s [%lld/%lld]", S.title, S.track, S.tracks);
+		return buf;
+	}
+	return S.title;
 }
 
 /* Draw t centred if it fits, otherwise as a seamless scrolling marquee. */
@@ -444,6 +452,10 @@ static void handle_property(mpv_event_property *pr)
 	} else if (!strcmp(pr->name, "volume")) {
 		if (pr->format == MPV_FORMAT_DOUBLE)
 			S.volume = *(double *)pr->data;
+	} else if (!strcmp(pr->name, "playlist-pos-1")) {
+		S.track = pr->format == MPV_FORMAT_INT64 ? *(int64_t *)pr->data : 0;
+	} else if (!strcmp(pr->name, "playlist-count")) {
+		S.tracks = pr->format == MPV_FORMAT_INT64 ? *(int64_t *)pr->data : 0;
 	} else if (!strcmp(pr->name, "seekable")) {
 		S.seekable = pr->format == MPV_FORMAT_FLAG && *(int *)pr->data;
 	} else if (!strcmp(pr->name, "vo-configured")) {
@@ -544,6 +556,7 @@ static void usage(void)
 	       "  -bg COLOR           background colour (default #202020)\n"
 	       "  -mute               start muted\n"
 	       "  -loop               loop the video\n"
+	       "  -tracknum           show playlist position as TITLE [M/N]\n"
 	       "  -ytdl-format FMT    yt-dlp format (default: low resolution)\n"
 	       "  -h, -help           show this help\n\n"
 	       "mouse: left = pause (no video: toggle help), double-left = open in mpv,\n"
@@ -597,6 +610,8 @@ int main(int argc, char **argv)
 			po.mute = 1;
 		else if (!strcmp(a, "-loop"))
 			po.loop = 1;
+		else if (!strcmp(a, "-tracknum"))
+			S.show_tracknum = 1;
 		else if (!strcmp(a, "-ytdl-format") && more)
 			po.ytdl_format = argv[++i];
 		else if (!strcmp(a, "-h") || !strcmp(a, "-help") || !strcmp(a, "--help")) {

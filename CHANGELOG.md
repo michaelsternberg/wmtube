@@ -5,6 +5,7 @@
 - Clear the video area when switching to an audio-only stream, so the
   previous video's last frame no longer stays on screen.
 - Ctrl+left / Ctrl+right: previous / next track in a playlist.
+- -tracknum option: show the playlist position as TITLE [M/N].
 - Live streams and internet radio show elapsed time only (mpv's
   "duration" for them is just elapsed time plus the buffer).
 

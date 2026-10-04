@@ -65,6 +65,7 @@ wmtube [options] [URL]
   -mode both|title|time|none   text rows shown at start (default both)
   -fg COLOR / -bg COLOR        text / background colour
   -mute, -loop
+  -tracknum                    show playlist position as TITLE [M/N]
   -ytdl-format FMT             yt-dlp format (default: 144p, H.264 preferred)
   -display DISPLAY             X display to use
 ```
