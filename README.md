@@ -96,6 +96,7 @@ station's "now playing" information as songs change.
 | Shift + right   | seek forward 10 s                                                      |
 | Ctrl + left     | previous track (playlists)                                             |
 | Ctrl + right    | next track (playlists)                                                 |
+| Ctrl+Shift+left | stop, clear the playlist and reset to the startup state                |
 | Middle          | play URL from PRIMARY / CLIPBOARD                                      |
 | Wheel           | volume                                                                 |
 

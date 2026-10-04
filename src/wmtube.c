@@ -41,6 +41,7 @@
 #define HELP_BOTTOM "LEFT: PAUSE  *  DOUBLE: FULL SIZE  *  RIGHT: TEXT ROWS  *  " \
                     "SHIFT+LEFT: -10S  *  SHIFT+RIGHT: +10S  *  " \
                     "CTRL+LEFT: PREV TRACK  *  CTRL+RIGHT: NEXT TRACK  *  WHEEL: VOLUME  *  " \
+                    "CTRL+SHIFT+LEFT: RESET  *  " \
                     "LEFT NOW: HIDE HELP"
 
 enum mode { MODE_BOTH, MODE_TITLE, MODE_TIME, MODE_NONE, MODE_COUNT };
@@ -61,6 +62,8 @@ static struct {
 	int vo_ok;		/* mpv has a video output (file has video) */
 	int seekable;		/* false for live streams / internet radio */
 	int show_tracknum;	/* -tracknum: append " [M/N]" to the title */
+	enum mode start_mode;	/* -mode, restored by the Ctrl+Shift+left reset */
+	int start_mute;		/* -mute, restored by the Ctrl+Shift+left reset */
 	long long track, tracks;	/* playlist position (1-based) and length */
 	int show_help;		/* help text while idle; left click toggles */
 
@@ -290,6 +293,24 @@ static void unload(void)
 	set_status("");
 }
 
+/* Ctrl+Shift+left: stop everything and go back to exactly the startup state. */
+static void reset_all(void)
+{
+	player_stop(&S.p);
+	unload();
+	S.url[0] = S.ytdl_err[0] = '\0';
+	S.show_help = 0;
+	S.mode = S.start_mode;
+	S.volume_until = 0;
+	S.last_click = 0;
+	mpv_set_property_string(S.p.mpv, "volume", "100");
+	mpv_set_property_string(S.p.mpv, "mute", S.start_mute ? "yes" : "no");
+	mpv_set_property_string(S.p.mpv, "pause", "no");
+	if (!in_path("yt-dlp") && !in_path("youtube-dl"))
+		set_status("NO YT-DLP FOUND");
+	S.dirty = 1;
+}
+
 static void load(const char *url)
 {
 	snprintf(S.url, sizeof(S.url), "%s", url);
@@ -339,6 +360,10 @@ static void handle_button(XButtonEvent *ev)
 
 	switch (ev->button) {
 	case Button1:
+		if (ctrl && shift) {	/* checked before ctrl / shift alone */
+			reset_all();
+			break;
+		}
 		if (ctrl) {
 			player_playlist_step(&S.p, -1);
 			break;
@@ -562,6 +587,7 @@ static void usage(void)
 	       "mouse: left = pause (no video: toggle help), double-left = open in mpv,\n"
 	       "       right = cycle text rows, shift+left = -10s, shift+right = +10s,\n"
 	       "       ctrl+left = previous track, ctrl+right = next track,\n"
+	       "       ctrl+shift+left = stop and reset to the startup state,\n"
 	       "       middle = play URL from selection,\n"
 	       "       wheel = volume\n");
 }
@@ -607,7 +633,7 @@ int main(int argc, char **argv)
 		else if (!strcmp(a, "-bg") && more)
 			bg = argv[++i];
 		else if (!strcmp(a, "-mute"))
-			po.mute = 1;
+			po.mute = S.start_mute = 1;
 		else if (!strcmp(a, "-loop"))
 			po.loop = 1;
 		else if (!strcmp(a, "-tracknum"))
@@ -643,6 +669,7 @@ int main(int argc, char **argv)
 		return 1;
 	S.tpos = S.dur = -1;
 	S.show_help = 0;	/* quiet WMTUBE tile; left click shows the help */
+	S.start_mode = S.mode;
 
 	if (!in_path("yt-dlp") && !in_path("youtube-dl"))
 		set_status("NO YT-DLP FOUND");

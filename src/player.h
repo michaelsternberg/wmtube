@@ -37,6 +37,7 @@ int player_render(struct player *p);
 
 void player_load(struct player *p, const char *url);
 void player_command(struct player *p, const char **args);
+void player_stop(struct player *p);
 void player_toggle_pause(struct player *p);
 void player_seek(struct player *p, double secs, const char *how);
 void player_add_volume(struct player *p, double delta);

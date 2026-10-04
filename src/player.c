@@ -152,6 +152,14 @@ void player_load(struct player *p, const char *url)
 	mpv_set_property_string(p->mpv, "pause", "no");
 }
 
+/* Stop playback and clear the playlist; mpv goes idle. */
+void player_stop(struct player *p)
+{
+	const char *cmd[] = { "stop", NULL };
+
+	player_command(p, cmd);
+}
+
 void player_toggle_pause(struct player *p)
 {
 	const char *cmd[] = { "cycle", "pause", NULL };
