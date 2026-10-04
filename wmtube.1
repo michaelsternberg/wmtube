@@ -7,10 +7,18 @@ wmtube \- play YouTube and PeerTube videos inside a Window Maker dockapp
 .SH DESCRIPTION
 .B wmtube
 is a 64x64 dockapp that streams a YouTube, PeerTube (any instance) or other
-yt-dlp supported video
-inside its tile. The 16:9 video fills a 56x32 band; the rows above and below
-can show a scrolling title and the elapsed / total play time in the classic
-LED dockapp style.
+yt-dlp supported video inside its tile. The 16:9 video fills a 56x32 band;
+the rows above and below can show a scrolling title and the elapsed / total
+play time in the classic LED dockapp style.
+.PP
+Playlist links (including YouTube Music playlists) play their tracks in
+order. Between tracks the video area goes blank and the title shows
+.B LOADING
+until the next one starts; album-only tracks show their cover art.
+.PP
+Internet radio and other live streams (e.g. Icecast / SHOUTcast URLs) play
+with a blank video area and elapsed time only; the title follows the
+station's "now playing" information as songs change.
 .PP
 Playback is done by libmpv, which uses
 .BR yt-dlp (1)
