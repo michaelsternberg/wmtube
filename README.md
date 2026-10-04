@@ -75,6 +75,10 @@ accepts `http(s)://` URLs, or a bare `youtube.com` / `youtu.be` address, so
 PeerTube links need their full `https://` URL. Local files can still be given
 on the command line.
 
+Playlist links (including YouTube Music playlists) play their tracks in
+order. Between tracks the video area goes blank and the title shows
+`LOADING` until the next one starts; album-only tracks show their cover art.
+
 ## Mouse
 
 | Action          | Effect                                                                 |
