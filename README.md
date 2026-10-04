@@ -26,8 +26,11 @@ in the 5x7 sea-green LED style of wmtop and other classic dockapps.
 
 - libmpv, libX11, libXext and their development headers
   - Debian / Ubuntu: `sudo apt install libmpv-dev libx11-dev libxext-dev pkg-config`
-- [yt-dlp](https://github.com/yt-dlp/yt-dlp) in `$PATH`. Keep it current
-  (e.g. `pipx install yt-dlp`), because site changes break old versions quickly.
+- [yt-dlp](https://github.com/yt-dlp/yt-dlp) in `$PATH` or `~/.local/bin`.
+  Keep it current (e.g. `pipx install yt-dlp`), because site changes break old
+  versions quickly. wmtube puts `~/.local/bin` first in its `$PATH` at
+  startup, so a pipx copy is found even if the window manager's `$PATH`
+  lacks it.
 - `mpv` (optional), for the double-click "open full size" action
 
 ## Installing
@@ -124,10 +127,10 @@ often, and an old yt-dlp can no longer resolve its videos. wmtube itself is
 fine.
 
 A common cause is having two copies of yt-dlp: the Debian package in
-`/usr/bin/yt-dlp`, which falls behind quickly, and a current one from pipx in
-`~/.local/bin/yt-dlp`. mpv runs whichever one comes first in `$PATH`, and the
-default `$PATH` puts `/usr/bin` before `~/.local/bin`, so the old copy wins
-even when a newer one is installed.
+`/usr/bin/yt-dlp`, which falls behind quickly, and a current one somewhere
+else. wmtube puts `~/.local/bin` (pipx's default) first in its `$PATH`, so a
+pipx copy there wins. A newer copy anywhere else must come before `/usr/bin`
+in the `$PATH` the window manager hands to wmtube.
 
 To check, list every copy and its version:
 
@@ -136,13 +139,9 @@ which -a yt-dlp
 yt-dlp --version
 ```
 
-To fix it, do one of these:
-
-- Remove the Debian package so only the pipx copy is left:
-  `sudo apt remove yt-dlp`
-- Or put `~/.local/bin` first in `$PATH` (e.g. in `~/.profile`), then log out
-  and back in so the window manager, and so wmtube, gets the new `$PATH`:
-  `export PATH="$HOME/.local/bin:$PATH"`
+To fix it, install a current yt-dlp with pipx and restart wmtube:
+`pipx install yt-dlp`. You may also remove the outdated Debian package with
+`sudo apt remove yt-dlp`.
 
 After that, keep yt-dlp current with `pipx upgrade yt-dlp` whenever videos
 stop loading.

@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased
+
+- Put ~/.local/bin first in $PATH at startup, so mpv finds a pipx yt-dlp
+  even when the window manager was started without it (instead of an
+  outdated distro copy, or none: "The page needs to be reloaded" /
+  "Unrecognized file format").
+
 ## 0.2 (2026-10-03)
 
 - Clear the video area when switching to an audio-only stream, so the

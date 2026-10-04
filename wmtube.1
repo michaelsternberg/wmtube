@@ -24,6 +24,11 @@ Playback is done by libmpv, which uses
 .BR yt-dlp (1)
 to resolve the URL. A low-resolution stream is requested by default to keep
 CPU and bandwidth use small.
+.I ~/.local/bin
+(where pipx installs yt-dlp) is put first in
+.B PATH
+at startup, so a current pipx yt-dlp is used even when the window manager
+was started without it.
 .SH OPTIONS
 .TP
 .BI \-display " display"

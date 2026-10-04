@@ -18,6 +18,7 @@
 #include <string.h>
 #include <time.h>
 #include <unistd.h>
+#include <sys/stat.h>
 #include <sys/wait.h>
 
 #include <X11/Xlib.h>
@@ -113,6 +114,31 @@ static int in_path(const char *prog)
 		path += n + (e ? 1 : 0);
 	}
 	return 0;
+}
+
+/* Put ~/.local/bin (where pipx installs yt-dlp) first in $PATH. A window
+ * manager often starts without it, and mpv would then run an outdated
+ * distro yt-dlp, or none at all. */
+static void add_local_bin(void)
+{
+	const char *home = getenv("HOME"), *path = getenv("PATH");
+	char dir[4096], buf[8192], *p, *tok;
+	struct stat st;
+
+	if (!home || !*home)
+		return;
+	snprintf(dir, sizeof(dir), "%s/.local/bin", home);
+	if (stat(dir, &st) < 0 || !S_ISDIR(st.st_mode))
+		return;
+	if (path && *path) {
+		snprintf(buf, sizeof(buf), "%s", path);
+		for (tok = strtok_r(buf, ":", &p); tok; tok = strtok_r(NULL, ":", &p))
+			if (!strcmp(tok, dir))
+				return;
+		snprintf(buf, sizeof(buf), "%s:%s", dir, path);
+	} else
+		snprintf(buf, sizeof(buf), "%s", dir);
+	setenv("PATH", buf, 1);
 }
 
 /* ---- drawing ---------------------------------------------------------- */
@@ -650,6 +676,8 @@ int main(int argc, char **argv)
 			return 1;
 		}
 	}
+
+	add_local_bin();
 
 	signal(SIGINT, on_signal);
 	signal(SIGTERM, on_signal);
