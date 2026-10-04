@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.2 (2026-10-03)
 
 - Clear the video area when switching to an audio-only stream, so the
   previous video's last frame no longer stays on screen.

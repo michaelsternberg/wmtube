@@ -1,3 +1,16 @@
+wmtube (0.2) unstable; urgency=medium
+
+  * Playlists: Ctrl+left / Ctrl+right for previous / next track, and a
+    -tracknum option that shows the position as TITLE [M/N].
+  * Ctrl+Shift+left stops playback and resets to the startup state.
+  * The idle tile starts quietly as WMTUBE; left click shows the help.
+  * Internet radio / live streams: show elapsed time only, and clear the
+    previous video's picture when switching to an audio-only stream.
+  * Man page and README describe YouTube Music playlists and internet
+    radio.
+
+ -- Michael Sternberg <mhsternberg@gmail.com>  Sat, 03 Oct 2026 20:49:12 -0500
+
 wmtube (0.1) unstable; urgency=medium
 
   * Initial release.
