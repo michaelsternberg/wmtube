@@ -109,6 +109,44 @@ Everything runs in one `poll()` loop on the X connection and an mpv wakeup
 pipe. By default it requests a 144p stream, which uses a few percent of one
 CPU core.
 
+## Troubleshooting
+
+### "The page needs to be reloaded" or "Failed to recognize file format"
+
+```
+wmtube: [ytdl_hook] ERROR: [youtube] AMHDlEV2Gxw: The page needs to be reloaded.
+wmtube: [ytdl_hook] youtube-dl failed: unexpected error occurred
+wmtube: [cplayer] Failed to recognize file format.
+```
+
+This almost always means mpv is running an outdated yt-dlp. YouTube changes
+often, and an old yt-dlp can no longer resolve its videos. wmtube itself is
+fine.
+
+A common cause is having two copies of yt-dlp: the Debian package in
+`/usr/bin/yt-dlp`, which falls behind quickly, and a current one from pipx in
+`~/.local/bin/yt-dlp`. mpv runs whichever one comes first in `$PATH`, and the
+default `$PATH` puts `/usr/bin` before `~/.local/bin`, so the old copy wins
+even when a newer one is installed.
+
+To check, list every copy and its version:
+
+```sh
+which -a yt-dlp
+yt-dlp --version
+```
+
+To fix it, do one of these:
+
+- Remove the Debian package so only the pipx copy is left:
+  `sudo apt remove yt-dlp`
+- Or put `~/.local/bin` first in `$PATH` (e.g. in `~/.profile`), then log out
+  and back in so the window manager, and so wmtube, gets the new `$PATH`:
+  `export PATH="$HOME/.local/bin:$PATH"`
+
+After that, keep yt-dlp current with `pipx upgrade yt-dlp` whenever videos
+stop loading.
+
 ## Disclaimer
 
 wmtube is an independent project. It is not affiliated with, endorsed by, or sponsored by YouTube, Google LLC, or the PeerTube project / Framasoft. YouTube is a trademark of Google LLC; PeerTube is a trademark of Framasoft. Users are responsible for complying with the terms of service of the sites they play videos from.
