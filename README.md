@@ -70,11 +70,12 @@ wmtube [options] [URL]
   -display DISPLAY             X display to use
 ```
 
-Drag the tile into the dock or clip. With no URL, middle-click the tile to
-play the URL in the selection or clipboard. For safety, the selection only
-accepts `http(s)://` URLs, or a bare `youtube.com` / `youtu.be` address, so
-PeerTube links need their full `https://` URL. Local files can still be given
-on the command line.
+Drag the tile into the dock or clip. With nothing playing the tile just shows
+`WMTUBE`; left-click it to show (or hide) a scrolling summary of the mouse
+controls. Middle-click the tile to play the URL in the selection or
+clipboard. For safety, the selection only accepts `http(s)://` URLs, or a
+bare `youtube.com` / `youtu.be` address, so PeerTube links need their full
+`https://` URL. Local files can still be given on the command line.
 
 Playlist links (including YouTube Music playlists) play their tracks in
 order. Between tracks the video area goes blank and the title shows

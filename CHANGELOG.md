@@ -6,6 +6,8 @@
   previous video's last frame no longer stays on screen.
 - Ctrl+left / Ctrl+right: previous / next track in a playlist.
 - -tracknum option: show the playlist position as TITLE [M/N].
+- The idle tile starts quietly as WMTUBE; a left click shows the help
+  text (it used to scroll by default).
 - Live streams and internet radio show elapsed time only (mpv's
   "duration" for them is just elapsed time plus the buffer).
 

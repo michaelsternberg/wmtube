@@ -642,7 +642,7 @@ int main(int argc, char **argv)
 	if (player_init(&S.p, &po) < 0)
 		return 1;
 	S.tpos = S.dur = -1;
-	S.show_help = 1;
+	S.show_help = 0;	/* quiet WMTUBE tile; left click shows the help */
 
 	if (!in_path("yt-dlp") && !in_path("youtube-dl"))
 		set_status("NO YT-DLP FOUND");
