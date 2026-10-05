@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.3 (2026-10-04)
 
 - Put ~/.local/bin first in $PATH at startup, so mpv finds a pipx yt-dlp
   even when the window manager was started without it (instead of an

@@ -1,3 +1,17 @@
+wmtube (0.3) unstable; urgency=medium
+
+  * Put ~/.local/bin first in $PATH at startup, so a pipx yt-dlp is found
+    even when the window manager was started without it.
+  * yt-dlp errors that usually mean yt-dlp is out of date end with
+    "- TRY PIPX UPGRADE YT-DLP" on the tile, and no longer show part of
+    yt-dlp's bug-report URL instead of the reason.
+  * Suggest yt-dlp instead of recommending it: Debian's copy is usually
+    too old for YouTube; install a current one with pipx.
+  * Troubleshooting section in the man page; README says to install the
+    package with apt rather than dpkg -i.
+
+ -- Michael Sternberg <mhsternberg@gmail.com>  Sun, 04 Oct 2026 20:36:07 -0500
+
 wmtube (0.2) unstable; urgency=medium
 
   * Playlists: Ctrl+left / Ctrl+right for previous / next track, and a

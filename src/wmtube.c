@@ -29,7 +29,7 @@
 #include "player.h"
 #include "selection.h"
 
-#define VERSION "0.2"
+#define VERSION "0.3"
 
 #define TICK_MS        66	/* marquee speed: ~15 px/s */
 #define MARQUEE_GAP    18	/* pixels of blank space before the title repeats */
