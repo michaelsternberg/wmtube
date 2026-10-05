@@ -4,7 +4,7 @@
 
 A YouTube / PeerTube player dockapp for [Window Maker](https://www.windowmaker.org/).
 
-<img src="docs/screenshot.png" alt="wmtube playing a video in the dock" width="232">
+<img src="docs/screenshot.gif" alt="wmtube playing a video in the dock" width="232">
 
 wmtube streams a video into a 64x64 dock tile. It plays YouTube, PeerTube (any
 server), or anything else [yt-dlp](https://github.com/yt-dlp/yt-dlp) can
@@ -177,5 +177,5 @@ wmtube is an independent project. It is not affiliated with, endorsed by, or spo
 
 GPL version 2 or later; see [COPYING](COPYING).
 
-The screenshot shows *Big Buck Bunny*, © Blender Foundation,
+The animation shows *Big Buck Bunny*, © Blender Foundation,
 [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/).
