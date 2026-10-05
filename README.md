@@ -26,11 +26,11 @@ in the 5x7 sea-green LED style of wmtop and other classic dockapps.
 
 - libmpv, libX11, libXext and their development headers
   - Debian / Ubuntu: `sudo apt install libmpv-dev libx11-dev libxext-dev pkg-config`
-- [yt-dlp](https://github.com/yt-dlp/yt-dlp) in `$PATH` or `~/.local/bin`.
-  Keep it current (e.g. `pipx install yt-dlp`), because site changes break old
-  versions quickly. wmtube puts `~/.local/bin` first in its `$PATH` at
-  startup, so a pipx copy is found even if the window manager's `$PATH`
-  lacks it.
+- A current [yt-dlp](https://github.com/yt-dlp/yt-dlp), installed with pipx
+  (`pipx install yt-dlp`). Distribution packages, including Debian's, fall
+  behind too quickly to keep working with YouTube. wmtube puts `~/.local/bin`
+  first in its `$PATH` at startup, so the pipx copy is found even if the
+  window manager's `$PATH` lacks it.
 - `mpv` (optional), for the double-click "open full size" action
 
 ## Installing
@@ -43,9 +43,24 @@ and install it with apt, which also pulls in the libraries it needs:
 sudo apt install ./wmtube_*_amd64.deb
 ```
 
-The package recommends `yt-dlp` and `mpv`. Debian's yt-dlp gets out of date
-quickly, so for YouTube a current yt-dlp (e.g. `pipx install yt-dlp`) is
-better.
+Use `apt install`, not `dpkg -i`. dpkg installs only the file itself, so
+libmpv and the other libraries are left missing and the package stays
+unconfigured. If you already used dpkg, `sudo apt -f install` fixes it. The
+`./` matters, because without a slash apt looks for a package of that name in
+its repositories.
+
+Then install a current yt-dlp with pipx. wmtube can't play YouTube without it:
+
+```sh
+sudo apt install pipx
+pipx install yt-dlp
+```
+
+The package recommends `mpv`, so apt installs it by default. It is used for
+the double-click "open full size" action. Debian's `yt-dlp` is only
+suggested, because it is usually too old to work. If it is installed anyway it
+does no harm: wmtube runs the pipx copy in `~/.local/bin` first. Keep the pipx
+copy current with `pipx upgrade yt-dlp` whenever videos stop loading.
 
 ## Building
 

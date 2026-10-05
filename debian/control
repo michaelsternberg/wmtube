@@ -16,7 +16,8 @@ Rules-Requires-Root: no
 Package: wmtube
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
-Recommends: yt-dlp, mpv
+Recommends: mpv
+Suggests: yt-dlp
 Enhances: wmaker
 Description: YouTube / PeerTube player dockapp for Window Maker
  wmtube streams a video into a 64x64 Window Maker dock tile, using libmpv
