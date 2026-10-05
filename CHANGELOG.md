@@ -6,6 +6,13 @@
   even when the window manager was started without it (instead of an
   outdated distro copy, or none: "The page needs to be reloaded" /
   "Unrecognized file format").
+- yt-dlp errors that usually mean yt-dlp is out of date ("The page needs
+  to be reloaded", "Unable to extract", ...) now end with
+  "- TRY PIPX UPGRADE YT-DLP" on the tile. Errors no longer show part of
+  yt-dlp's bug-report URL instead of the reason.
+- The Debian package suggests yt-dlp instead of recommending it, since
+  Debian's copy is usually too old for YouTube.
+- Troubleshooting section in the man page.
 
 ## 0.2 (2026-10-03)
 

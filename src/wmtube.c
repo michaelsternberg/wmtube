@@ -58,6 +58,7 @@ static struct {
 	char title[512];	/* normalised media-title */
 	char status[256];	/* overrides the title when non-empty */
 	char ytdl_err[256];	/* last yt-dlp error, shown instead of mpv's */
+	int ytdl_stale;		/* that error suggests yt-dlp is out of date */
 	double tpos, dur, volume;
 	int paused, have_video, loading;
 	int vo_ok;		/* mpv has a video output (file has video) */
@@ -325,6 +326,7 @@ static void reset_all(void)
 	player_stop(&S.p);
 	unload();
 	S.url[0] = S.ytdl_err[0] = '\0';
+	S.ytdl_stale = 0;
 	S.show_help = 0;
 	S.mode = S.start_mode;
 	S.volume_until = 0;
@@ -534,6 +536,42 @@ static void log_safe(const char *prefix, const char *text)
 	fprintf(stderr, "wmtube: [%s] %s", prefix, buf);
 }
 
+/* yt-dlp errors that usually mean YouTube changed and yt-dlp needs
+ * updating, as opposed to e.g. a private or removed video. yt-dlp appends
+ * "Confirm you are on the latest version" to its report-a-bug errors. */
+static int ytdl_outdated(const char *text)
+{
+	static const char *const pat[] = {
+		"The page needs to be reloaded",
+		"Unable to extract",
+		"nsig extraction failed",
+		"Signature extraction failed",
+		"Requested format is not available",
+		"Confirm you are on the latest version",
+	};
+	size_t i;
+
+	for (i = 0; i < sizeof(pat) / sizeof(pat[0]); i++)
+		if (strstr(text, pat[i]))
+			return 1;
+	return 0;
+}
+
+/* Keep the reason from "ERROR: [youtube] <id>: <reason>; please report
+ * this issue on https://..." for the tile. */
+static void set_ytdl_err(const char *text)
+{
+	char *cut, *r;
+
+	snprintf(S.ytdl_err, sizeof(S.ytdl_err), "%s", text + 7);
+	if ((cut = strstr(S.ytdl_err, "; please report")))
+		*cut = '\0';
+	r = strrchr(S.ytdl_err, ':');
+	if (r)
+		memmove(S.ytdl_err, r + 1, strlen(r + 1) + 1);
+	S.ytdl_stale |= ytdl_outdated(text);
+}
+
 static void handle_mpv_events(void)
 {
 	char msg[300];
@@ -552,6 +590,7 @@ static void handle_mpv_events(void)
 			break;
 		case MPV_EVENT_START_FILE:
 			S.ytdl_err[0] = '\0';
+			S.ytdl_stale = 0;
 			set_status("LOADING");
 			break;
 		case MPV_EVENT_FILE_LOADED:
@@ -568,7 +607,8 @@ static void handle_mpv_events(void)
 				S.have_video = 0;
 				S.loading = 0;
 				if (S.ytdl_err[0])
-					snprintf(msg, sizeof(msg), "ERROR: %s", S.ytdl_err);
+					snprintf(msg, sizeof(msg), "ERROR: %.200s%s", S.ytdl_err,
+					         S.ytdl_stale ? " - TRY PIPX UPGRADE YT-DLP" : "");
 				else
 					snprintf(msg, sizeof(msg), "ERROR: %s",
 					         mpv_error_string(ef->error));
@@ -582,11 +622,8 @@ static void handle_mpv_events(void)
 			log_safe(lm->prefix, lm->text);
 			/* "ERROR: [youtube] <id>: This video is unavailable" */
 			if (!strcmp(lm->prefix, "ytdl_hook") &&
-			    !strncmp(lm->text, "ERROR: ", 7)) {
-				const char *r = strrchr(lm->text, ':');
-
-				snprintf(S.ytdl_err, sizeof(S.ytdl_err), "%s", r ? r + 1 : lm->text + 7);
-			}
+			    !strncmp(lm->text, "ERROR: ", 7))
+				set_ytdl_err(lm->text);
 			break;
 		}
 		default:

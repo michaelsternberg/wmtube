@@ -129,6 +129,12 @@ CPU core.
 
 ## Troubleshooting
 
+### NO YT-DLP FOUND
+
+The tile shows this at startup when neither `yt-dlp` nor `youtube-dl` is in
+`$PATH` or `~/.local/bin`. Install a current yt-dlp with `pipx install yt-dlp`
+and restart wmtube.
+
 ### "The page needs to be reloaded" or "Failed to recognize file format"
 
 ```
@@ -139,7 +145,9 @@ wmtube: [cplayer] Failed to recognize file format.
 
 This almost always means mpv is running an outdated yt-dlp. YouTube changes
 often, and an old yt-dlp can no longer resolve its videos. wmtube itself is
-fine.
+fine. For errors like this the tile adds `- TRY PIPX UPGRADE YT-DLP` to the
+scrolling error message. Errors that come from the site, such as "This video
+is unavailable", are shown without it.
 
 A common cause is having two copies of yt-dlp: the Debian package in
 `/usr/bin/yt-dlp`, which falls behind quickly, and a current one somewhere

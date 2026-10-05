@@ -94,6 +94,37 @@ started with \fB\-mute\fR).
 .TP
 .B Scroll wheel
 Volume up / down; the level is shown briefly in the time row.
+.SH TROUBLESHOOTING
+.TP
+.B NO YT-DLP FOUND
+Neither yt-dlp nor youtube-dl is in
+.BR PATH .
+Install a current yt-dlp with
+.BR "pipx install yt-dlp" .
+.TP
+.B ... - TRY PIPX UPGRADE YT-DLP
+yt-dlp failed in a way that usually means the site changed and yt-dlp is
+out of date, for example
+.I The page needs to be reloaded
+or
+.IR "Unable to extract" .
+Run
+.B pipx upgrade yt-dlp
+and play the video again. Distribution packages of yt-dlp, including
+Debian's, are usually too old to work with YouTube. If a packaged copy is
+also installed, check which one wmtube finds with
+.B which -a yt-dlp
+and
+.BR "yt-dlp --version" ;
+a pipx copy in
+.I ~/.local/bin
+wins, since wmtube puts that directory first in
+.BR PATH .
+.PP
+Other errors, such as
+.IR "This video is unavailable" ,
+come from the site and are shown without the hint. Run wmtube from a
+terminal to see the full mpv and yt-dlp messages.
 .SH SEE ALSO
 .BR mpv (1),
 .BR yt-dlp (1),
